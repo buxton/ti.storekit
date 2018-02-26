@@ -14,7 +14,7 @@
   if (self = [super _initWithPageContext:context]) {
     _productDiscount = productDiscount;
   }
-  
+
   return self;
 }
 
@@ -31,8 +31,8 @@
 - (NSDictionary *)subscriptionPeriod
 {
   return @{
-    @"numberOfUnits": @(_productDiscount.subscriptionPeriod.numberOfUnits),
-    @"unit": @(_productDiscount.subscriptionPeriod.unit),
+    @"numberOfUnits" : @(_productDiscount.subscriptionPeriod.numberOfUnits),
+    @"unit" : @(_productDiscount.subscriptionPeriod.unit),
   };
 }
 

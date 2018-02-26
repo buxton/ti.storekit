@@ -23,9 +23,9 @@
 
 #pragma mark Utils
 
-#define RETURN_UNDEFINED_IF_NIL(name) \
-  if (!name) {                        \
-    return nil;                       \
+#define RETURN_NULL_IF_NIL(name) \
+  if (!name) {                   \
+    return [NSNull null];        \
   }
 
 #pragma mark Public API's
@@ -40,59 +40,59 @@
   [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
 }
 
-- (NSNumber *)state
+- (id)state
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return NUMINT(transaction.transactionState);
 }
 
 - (id)date
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.transactionDate;
 }
 
-- (NSString *)identifier
+- (id)identifier
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.transactionIdentifier;
 }
 
-- (NSArray *)downloads
+- (id)downloads
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.downloads ? [[TiStorekitModule sharedInstance] tiDownloadsFromStoreKitDownloads:transaction.downloads] : nil;
 }
 
-- (TiStorekitTransaction *)originalTransaction
+- (id)originalTransaction
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.originalTransaction ? [[TiStorekitTransaction alloc] initWithTransaction:transaction.originalTransaction pageContext:[self pageContext]] : nil;
 }
 
-- (NSString *)receipt
+- (id)receipt
 {
   NSData *dataReceipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
 
-  RETURN_UNDEFINED_IF_NIL(dataReceipt);
+  RETURN_NULL_IF_NIL(dataReceipt);
   return [dataReceipt base64EncodedStringWithOptions:0];
 }
 
-- (NSNumber *)quantity
+- (id)quantity
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.payment ? NUMINTEGER(transaction.payment.quantity) : nil;
 }
 
-- (NSString *)productIdentifier
+- (id)productIdentifier
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.payment ? transaction.payment.productIdentifier : nil;
 }
 
-- (NSString *)applicationUsername
+- (id)applicationUsername
 {
-  RETURN_UNDEFINED_IF_NIL(transaction);
+  RETURN_NULL_IF_NIL(transaction);
   return transaction.payment ? transaction.payment.applicationUsername : nil;
 }
 

@@ -60,10 +60,14 @@
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error
 {
-  NSLog(@"[ERROR] received error %@", [TiStorekitModule descriptionFromError:error]);
-  NSDictionary *event = @{ @"success": NUMBOOL(NO), @"message": [TiStorekitModule descriptionFromError:error] };
-  [self _fireEventToListener:@"callback" withObject:event listener:_callback thisObject:nil];
+  NSLog(@"[ERROR] Product request failed: %@", [TiStorekitModule descriptionFromError:error]);
 
+  NSDictionary *event = @{
+    @"success" : NUMBOOL(NO),
+    @"message" : [TiStorekitModule descriptionFromError:error]
+  };
+
+  [self _fireEventToListener:@"callback" withObject:event listener:_callback thisObject:nil];
   [self forgetSelf];
 }
 

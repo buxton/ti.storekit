@@ -29,7 +29,7 @@
     id downloads = [args objectForKey:@"downloads"];                                                                                                  \
     ENSURE_ARRAY(downloads);                                                                                                                          \
     if ([[SKPaymentQueue defaultQueue] respondsToSelector:@selector(name:)]) {                                                                        \
-      [[SKPaymentQueue defaultQueue] performSelector:@selector(name:) withObject:[self storeKitDownloadsFromTiDownloads:downloads]];                        \
+      [[SKPaymentQueue defaultQueue] performSelector:@selector(name:) withObject:[self storeKitDownloadsFromTiDownloads:downloads]];                  \
     }                                                                                                                                                 \
   }
 
@@ -463,7 +463,7 @@ MAKE_SYSTEM_PROP(PERIOD_UNIT_YEAR, SKProductPeriodUnitYear);
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
   for (SKPaymentTransaction *transaction in transactions) {
-    [self handleTransaction:transaction error:transaction.error];
+    [self handleTransaction:transaction];
   }
 }
 
@@ -509,18 +509,18 @@ MAKE_SYSTEM_PROP(PERIOD_UNIT_YEAR, SKProductPeriodUnitYear);
   return event;
 }
 
-- (void)handleTransaction:(SKPaymentTransaction *)transaction error:(NSError *)error
+- (void)handleTransaction:(SKPaymentTransaction *)transaction
 {
   SKPaymentTransactionState state = transaction.transactionState;
   NSMutableDictionary *event = [self populateTransactionEvent:transaction];
 
   if (state == SKPaymentTransactionStateFailed) {
-    NSLog(@"[WARN] Error in transaction: %@", [TiStorekitModule descriptionFromError:error]);
+    NSLog(@"[WARN] Error in transaction: %@", [TiStorekitModule descriptionFromError:transaction.error]);
     // MOD-1025: Cancelled state is actually determined by the error code
-    BOOL cancelled = ([error code] == SKErrorPaymentCancelled);
+    BOOL cancelled = (transaction.error.code == SKErrorPaymentCancelled);
     [event setObject:NUMBOOL(cancelled) forKey:@"cancelled"];
     if (!cancelled) {
-      [event setObject:[TiStorekitModule descriptionFromError:error] forKey:@"message"];
+      [event setObject:[TiStorekitModule descriptionFromError:transaction.error] forKey:@"message"];
     }
   } else if (state == SKPaymentTransactionStateRestored) {
     NSLog(@"[DEBUG] Transaction restored %@", transaction);
@@ -625,7 +625,7 @@ MAKE_SYSTEM_PROP(PERIOD_UNIT_YEAR, SKProductPeriodUnitYear);
 {
   NSArray<NSString *> *allowedStorePaymentProductIdentifiers = [self valueForKey:@"allowedStorePaymentProductIdentifiers"];
 
-  return !allowedStorePaymentProductIdentifiers || allowedStorePaymentProductIdentifiers && [allowedStorePaymentProductIdentifiers containsObject:product.productIdentifier];
+  return !allowedStorePaymentProductIdentifiers || (allowedStorePaymentProductIdentifiers && [allowedStorePaymentProductIdentifiers containsObject:product.productIdentifier]);
 }
 
 @end

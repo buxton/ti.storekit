@@ -84,7 +84,7 @@
     DebugLog(@"[ERROR] The \"introductoryPrice\" property is only available on iOS 11.2 and later.");
     return nil;
   }
-  
+
   return [[TiStorekitProductDiscountProxy alloc] initWithProductDiscount:_product.introductoryPrice pageContext:self.pageContext];
 }
 
@@ -94,10 +94,10 @@
     DebugLog(@"[ERROR] The \"subscriptionPeriod\" property is only available on iOS 11.2 and later.");
     return nil;
   }
-  
+
   return @{
-    @"numberOfUnits": @(_product.subscriptionPeriod.numberOfUnits),
-    @"unit": @(_product.subscriptionPeriod.unit),
+    @"numberOfUnits" : @(_product.subscriptionPeriod.numberOfUnits),
+    @"unit" : @(_product.subscriptionPeriod.unit),
   };
 }
 #endif
