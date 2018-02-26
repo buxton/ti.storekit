@@ -75,6 +75,20 @@ static TiStorekitModule *sharedInstance;
 
 #pragma mark Public API's
 
+- (void)registerAppForAdNetworkAttribution:(id)unused
+{
+  if (![TiUtils isIOSVersionOrGreater:@"11.3"]) {
+    DebugLog(@"[ERROR] The \"registerAppForAdNetworkAttribution()\" method is only available on iOS 11.3 and later");
+    return;
+  }
+
+  Class AdNetwork = NSClassFromString(@"SKAdNetwork");
+
+  if (AdNetwork != nil && [AdNetwork respondsToSelector:@selector(registerAppForAdNetworkAttribution)]) {
+    [AdNetwork performSelector:@selector(registerAppForAdNetworkAttribution)];
+  }
+}
+
 - (void)addTransactionObserver:(id)args
 {
   [[SKPaymentQueue defaultQueue] addTransactionObserver:self];

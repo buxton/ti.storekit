@@ -61,63 +61,6 @@ Testing the store must be done on actual devices.
 - Passing separate arguments `purchase(object, quantity[int, optional])`. Use a dictionary of arguments as seen in the API docs instead.
 - The transaction event key `receipt` will now include a Base 64-encoded string of the receipt instead of a JSON-blob 
 
-## Breaking changes in version 3.0.0
-
-- `addTransactionObserver` must be called in order for any events to be fired for `transactionState`, `restoredCompletedTransactions`, and `updatedDownloads` event listeners. See the `addTransactionObserver` documentation for more details.
-- Added support for Apple's new receipt structure available in iOS 7.0 and later. To `validateReceipt`:  
-
-	1. Obtain the Apple Inc. root certificate from [http://www.apple.com/certificateauthority/](http://www.apple.com/certificateauthority/)
-	2. Download the Apple Inc. Root Certificate ( [http://www.apple.com/appleca/AppleIncRootCertificate.cer](http://www.apple.com/appleca/AppleIncRootCertificate.cer) )
-	3. Add the AppleIncRootCertificate.cer to your app's `Resources` folder.
-	4. Set the `bundleVersion` and `bundleIdentifier` properties of the module.
-	5. Call `validateReceipt()`.
-	6. If the receipt does not exist (only happens in development), refresh the receipt.
-
-- Apple hosted downloads are supported. The basic steps for downloading hosted content:
-	1. Create a product.
-	2. Create Hosted content (guide to [Creating App Store Hosted Content](https://github.com/appcelerator-modules/ti.storekit/wiki/Creating-App-Store-Hosted-Content)).
-	3. Add the content to the product.
-	4. Set the `autoFinishTransactions` property to false.
-	5. Purchase the product.
-	6. When the state of the `transactionState` event is `TRANSACTION_STATE_PURCHASED` and the `downloads` property of the event exists, start the downloads.
-	7. When the download completes, finish the transaction.
-	
-- Passing arguments to the `purchase` function individually is DEPRECATED, pass them as a dictionary instead.
-- Transaction state constants `PURCHASING`, `PURCHASED`, `FAILED`, and `RESTORED` have been DEPRECATED in favor of `TRANSACTION_STATE_PURCHASING`, `TRANSACTION_STATE_PURCHASED`, `TRANSACTION_STATE_FAILED`, and `TRANSACTION_STATE_RESTORED`.
-- Some event properties in the `transactionState` event have been DEPRECATED. See the `transactionState` event documentation for more details.
-- An alert dialog warning will now be shown when run in the simulator. This dialog can be disabled by setting the `suppressSimulatorWarning` property on the module to true.
-
-### Apple Hosted Purchases
-Apple hosted in app purchases can now be downloaded. Must be [Non-Consumable Purchases](https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/13_ManagingIn-AppPurchases/ManagingIn-AppPurchases.html#//apple_ref/doc/uid/TP40011225-CH4-SW37) to be hosted by Apple. This guide will assist with [Creating App Store Hosted Content](https://github.com/appcelerator-modules/ti.storekit/wiki/Creating-App-Store-Hosted-Content).
-
-### Warning
-This module uses open source code for parsing and validating the receipt. It is recommended by Apple that users not use common code to do this as it will make it easier to crack your app. Please make appropriate changes to the receipt verification code in the module to make your implementation unique and less vulnerable to attack. We cannot do this for you or offer recommendations regarding how it should be done due to aforementioned reasons.
-
-## Breaking Changes in version 2.0.0
-
-It was previously possible for a transaction to complete after the application had been moved to the background due to the app store
-needing to obtain information from the user. Although your application may have received a _FAILED_ notification when your application
-was moved to the background, your application would not have received a _PURCHASED_ notification if the user completed the transaction from
-the app store. In order to support this situation, purchase notifications are now sent to your application as an event rather than through
-a callback.
-
-If you are upgrading from an earlier version of this module (prior to version 2.0.0) you should be
-aware of the following breaking changes to the API:
-
-* The _purchase_ function no longer returns a Ti.Storekit.Payment object.
-* The _callback_ parameter has been removed from the _purchase_ function. You must now register an event listener 
-for the _transactionState_ event to receive notification of FAILED and PURCHASED transaction events.
-* The _payment_ property is no longer returned as part of the transaction complete notification.
-
-## Deprecated since version 1.6.0
-
-The _verifyReceipt_ function has been updated to better support receipt verification with Apple. As a result, the following
-changes have been made to the _verifyReceipt_ function:
-
-* Setting the callback in the argument dictionary has been DEPRECATED. Pass the callback as the 2nd parameter to _verifyReceipt_.
-* Setting the sandbox property in the argument dictionary has been DEPRECATED. Use the 'receiptVerificationSandbox' property for the module.
-* Setting the sharedSecret property in the argument dictionary has been DEPRECATED. Use the 'receiptVerificationSharedSecret' property for the module.
-
 ## Helpful Links
 
 * [In-App Purchase for Developers](https://developer.apple.com/in-app-purchase/)
@@ -125,6 +68,18 @@ changes have been made to the _verifyReceipt_ function:
 * [Creating App Store Hosted Content](https://github.com/appcelerator-modules/ti.storekit/wiki/Creating-App-Store-Hosted-Content)
 
 ## Functions
+
+### registerAppForAdNetworkAttribution()
+
+(iOS 11.3 +)
+
+Verifies the first launch of an app purchased as a result of an ad.
+
+Apps that participate in an advertising network should call `registerAppForAdNetworkAttribution` when the app first launches.
+
+This method generates a conversion notification, which is the cryptographically signed data validating that a user purchased and launched this app as a result of an ad.
+
+The first call to `registerAppForAdNetworkAttribution` generates the notification if the device has attribution data for that app; subsequent calls have no effect.
 
 ### addTransactionObserver()
 
@@ -413,37 +368,50 @@ The CANCELLED state during download request processing.
 
 The value of `timeRemaining` when it cannot create a good estimate.
 
-
 ### DISCOUNT_PAYMENT_MODE_PAY_AS_YOU_GO[int]
+
+(iOS 11.2 +)
 
 The value of the product's `paymentMode`, indicating that the payment mode
 of a product discount is billed over a single or multiple billing periods.
 
 ### DISCOUNT_PAYMENT_MODE_PAY_UP_FRONT[int]
 
+(iOS 11.2 +)
+
 The value of the product's `paymentMode`, indicating that the payment mode of
 a product discount is paid up front.
 
 ### DISCOUNT_PAYMENT_MODE_FREE_TRIAL[int]
 
+(iOS 11.2 +)
+
 The value of the product's `paymentMode`, indicating that the payment mode is a free trial.
 
 ### PERIOD_UNIT_DAY[int]
+
+(iOS 11.2 +)
 
 The value of the product's `introductoryPrice.subscriptionPeriod.unit` or `subscriptionPeriod.unit`,
 indicating an interval lasting one day.
 
 ### PERIOD_UNIT_WEEK[int]
 
+(iOS 11.2 +)
+
 The value of the product's `introductoryPrice.subscriptionPeriod.unit` or `subscriptionPeriod.unit`,
 indicating an interval lasting one week.
 
 ### PERIOD_UNIT_MONTH[int]
 
+(iOS 11.2 +)
+
 The value of the product's `introductoryPrice.subscriptionPeriod.unit` or `subscriptionPeriod.unit`,
 indicating an interval lasting one month.
 
 ### PERIOD_UNIT_YEAR[int]
+
+(iOS 11.2 +)
 
 The value of the product's `introductoryPrice.subscriptionPeriod.unit` or `subscriptionPeriod.unit`,
 indicating an interval lasting one year.
